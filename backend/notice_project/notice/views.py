@@ -4,11 +4,11 @@ import datetime
 import requests
 from django.http import JsonResponse, request
 from rest_framework import views, status, views
-from rest_framework.serializers import Serializer
 from .storage import db
-from .serializers import CreateNoticeSerializer
+from .serializers import NoticeboardRoom, CreateNoticeSerializer
 from django.http import HttpResponse
 from rest_framework.generics import ListAPIView
+import uuid
 
 
 @api_view(['GET'])
@@ -24,7 +24,14 @@ def sidebar(request):
 
         if res['status'] == 200:
 
+            res = requests.get("noticeboard_room", org_id).json()
+            if res['status'] == 200 and res is not None:
+                public_rooms = res['data']
+            else:
+                public_rooms = []
+
             sidebar = {
+<<<<<<< HEAD
                 "name": "Noticeboard Plugin",
                 "description": "Displays Information On A Noticeboard",
                         "plugin_id": "6139ca8d59842c7444fb01fe",
@@ -48,9 +55,42 @@ def sidebar(request):
             return Response({"status": True, "data": sidebar}, status=status.HTTP_200_OK)
         return Response({"status": False, "message": res["message"]}, status=status.HTTP_400_BAD_REQUEST)
     return Response({"status": False, "message": "Check your query parameter"})
+=======
+                        "name" : "Noticeboard Plugin",
+                        "description" : "Displays Information On A Noticeboard",
+                        "plugin_id" : "613fc3ea6173056af01b4b3e",
+                        "organisation_id" : f"{org_id}",
+                        "user_id" : f"{user_id}",
+                        "group_name" : "Noticeboard",
+                        "show_group" : False,
+                        "joined_rooms": [],
+                        "public_rooms": public_rooms
+                    }
+            return Response({"status":True, "data":sidebar}, status=status.HTTP_200_OK)
+        return Response({"status":False, "message":res["message"]}, status=status.HTTP_400_BAD_REQUEST)
+    return Response({"status":False, "message":"Check your query parameter"})
+    
+@api_view(['POST'])
+def create_room(request):
+    org_id = "613a1a3b59842c7444fb0220"
+    serializer = NoticeboardRoom(data=request.data)
+    if serializer.is_valid():
+        db.save("noticeboard_room", org_id, serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(['GET'])
+def get_room(request):
+    org_id = "613a1a3b59842c7444fb0220"
+    data = db.read("noticeboard_room", org_id)
+    return Response(data)
+>>>>>>> 1a859a53a498550d1f4a5b9b770414dea004d3d1
+
+
+@api_view(['GET'])
 def install(request):
+<<<<<<< HEAD
     install = {
         "name": "Noticeboard Plugin",
         "description": "Creates Notice",
@@ -58,6 +98,26 @@ def install(request):
     }
     return JsonResponse(install, safe=False)
 
+=======
+    data = {
+            "room_id": uuid.uuid4(),
+            "title": "noticeboard",
+            "unread": "0",
+            "members": "0",
+            "icon": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRr-kPo-vAmp_GrCZbnmqT6PMU5Wi5BLwgvPQ&usqp=CAU",
+            "action": "open"
+        }
+
+    requests.post("https://noticeboard.zuri.chat/api/v1/create-notice-room", data=data)
+    # requests.post("http://localhost:8000/api/v1/create-notice-room", data=data)
+
+    install = {
+        "name" : "Noticeboard Plugin",
+        "description" : "Creates Notice",
+        "plugin_id" : "613fc3ea6173056af01b4b3e",
+    }
+    return Response(install)
+>>>>>>> 1a859a53a498550d1f4a5b9b770414dea004d3d1
 
 class CreateNewNotices(views.APIView):
 
@@ -67,10 +127,12 @@ class CreateNewNotices(views.APIView):
 
     def post(self, request):
         serializer = CreateNoticeSerializer(data=request.data)
-        dateAndTime = datetime.datetime.now()
 
         if serializer.is_valid():
+<<<<<<< HEAD
             department = serializer.validated_data.get("department")
+=======
+>>>>>>> 1a859a53a498550d1f4a5b9b770414dea004d3d1
             db.save(
                 "noticeboard",
                 "613a1a3b59842c7444fb0220",
@@ -82,6 +144,7 @@ class CreateNewNotices(views.APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+<<<<<<< HEAD
 class NoticeAPI(views.APIView):
 
     def get(self, request):
@@ -146,6 +209,9 @@ class DeleteNotice(views.APIView):
 
 
 class search(ListAPIView):
+=======
+class search(ListAPIView):    
+>>>>>>> 1a859a53a498550d1f4a5b9b770414dea004d3d1
     def get(self, request):
         notice = db.read("noticeboard", "613a1a3b59842c7444fb0220")
         if notice['status'] == 200:
