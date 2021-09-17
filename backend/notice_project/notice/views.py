@@ -31,45 +31,21 @@ def sidebar(request):
                 public_rooms = []
 
             sidebar = {
-<<<<<<< HEAD
                 "name": "Noticeboard Plugin",
                 "description": "Displays Information On A Noticeboard",
-                        "plugin_id": "6139ca8d59842c7444fb01fe",
+                        "plugin_id": "613fc3ea6173056af01b4b3e",
                         "organisation_id": f"{org_id}",
                         "user_id": f"{user_id}",
                         "group_name": "Noticeboard",
                         "show_group": False,
                         "joined_rooms": [],
-                        "public_rooms": [
-                            {
-                                "title": "jokes",
-                                "id": "DFGfH-EDDDDS-DFDDF",
-                                "unread": 342,
-                                "members": 32,
-                                "icon": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRr-kPo-vAmp_GrCZbnmqT6PMU5Wi5BLwgvPQ&usqp=CAU",
-                                "action": "open",
-                                "auto-join": True
-                            }
-                        ]
+                        "public_rooms": public_rooms
             }
             return Response({"status": True, "data": sidebar}, status=status.HTTP_200_OK)
         return Response({"status": False, "message": res["message"]}, status=status.HTTP_400_BAD_REQUEST)
     return Response({"status": False, "message": "Check your query parameter"})
-=======
-                        "name" : "Noticeboard Plugin",
-                        "description" : "Displays Information On A Noticeboard",
-                        "plugin_id" : "613fc3ea6173056af01b4b3e",
-                        "organisation_id" : f"{org_id}",
-                        "user_id" : f"{user_id}",
-                        "group_name" : "Noticeboard",
-                        "show_group" : False,
-                        "joined_rooms": [],
-                        "public_rooms": public_rooms
-                    }
-            return Response({"status":True, "data":sidebar}, status=status.HTTP_200_OK)
-        return Response({"status":False, "message":res["message"]}, status=status.HTTP_400_BAD_REQUEST)
-    return Response({"status":False, "message":"Check your query parameter"})
-    
+
+
 @api_view(['POST'])
 def create_room(request):
     org_id = "613a1a3b59842c7444fb0220"
@@ -85,39 +61,30 @@ def get_room(request):
     org_id = "613a1a3b59842c7444fb0220"
     data = db.read("noticeboard_room", org_id)
     return Response(data)
->>>>>>> 1a859a53a498550d1f4a5b9b770414dea004d3d1
 
 
 @api_view(['GET'])
 def install(request):
-<<<<<<< HEAD
-    install = {
-        "name": "Noticeboard Plugin",
-        "description": "Creates Notice",
-        "plugin_id": "6139ca8d59842c7444fb01fe",
-    }
-    return JsonResponse(install, safe=False)
-
-=======
     data = {
-            "room_id": uuid.uuid4(),
-            "title": "noticeboard",
-            "unread": "0",
-            "members": "0",
-            "icon": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRr-kPo-vAmp_GrCZbnmqT6PMU5Wi5BLwgvPQ&usqp=CAU",
-            "action": "open"
-        }
+        "room_id": uuid.uuid4(),
+        "title": "noticeboard",
+        "unread": "0",
+        "members": "0",
+        "icon": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRr-kPo-vAmp_GrCZbnmqT6PMU5Wi5BLwgvPQ&usqp=CAU",
+        "action": "open"
+    }
 
-    requests.post("https://noticeboard.zuri.chat/api/v1/create-notice-room", data=data)
+    requests.post(
+        "https://noticeboard.zuri.chat/api/v1/create-notice-room", data=data)
     # requests.post("http://localhost:8000/api/v1/create-notice-room", data=data)
 
     install = {
-        "name" : "Noticeboard Plugin",
-        "description" : "Creates Notice",
-        "plugin_id" : "613fc3ea6173056af01b4b3e",
+        "name": "Noticeboard Plugin",
+        "description": "Creates Notice",
+        "plugin_id": "613fc3ea6173056af01b4b3e",
     }
     return Response(install)
->>>>>>> 1a859a53a498550d1f4a5b9b770414dea004d3d1
+
 
 class CreateNewNotices(views.APIView):
 
@@ -129,10 +96,6 @@ class CreateNewNotices(views.APIView):
         serializer = CreateNoticeSerializer(data=request.data)
 
         if serializer.is_valid():
-<<<<<<< HEAD
-            department = serializer.validated_data.get("department")
-=======
->>>>>>> 1a859a53a498550d1f4a5b9b770414dea004d3d1
             db.save(
                 "noticeboard",
                 "613a1a3b59842c7444fb0220",
@@ -142,27 +105,6 @@ class CreateNewNotices(views.APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-<<<<<<< HEAD
-class NoticeAPI(views.APIView):
-
-    def get(self, request):
-        notice = db.read("noticeboard", "613a1a3b59842c7444fb0220")
-        if notice['status'] == 200:
-            return Response(
-                {
-                    "status": True,
-                    "data": notice['data'],
-                    "message": "Successfully retrieved"
-                },
-                status=status.HTTP_200_OK)
-        return Response(
-            {
-                "success": False,
-                "message": "Boss do am again, e no retrieve. No vex"
-            },
-            status=status.HTTP_400_BAD_REQUEST)
 
 
 class UpdateNoticeAPIView(views.APIView):
@@ -176,42 +118,18 @@ class UpdateNoticeAPIView(views.APIView):
                 {
                     "success": True,
                     "data": serializer.data,
-                    "message": "Successfully updated"
+                    "message": "Notice has been successfully updated"
                 },
                 status=status.HTTP_201_CREATED)
         return Response(
             {
                 "success": False,
-                "message": "Boss do am again, e no create. No vex"
+                "message": "Notice not updated, Please Try Again"
             },
             status=status.HTTP_400_BAD_REQUEST)
 
 
-class DeleteNotice(views.APIView):
-
-    def delete(self, request):
-        notice = db.delete("613a1a3b59842c7444fb0220",
-                           "noticeboard", "613f47b26173056af01b4a56")
-        if notice['status'] == 200:
-            return Response(
-                {
-                    "success": True,
-                    "message": "Deleted successfully"
-                },
-                status=status.HTTP_200_OK)
-        return Response(
-            {
-                "success": False,
-                "message": "Could not delete"
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
-
 class search(ListAPIView):
-=======
-class search(ListAPIView):    
->>>>>>> 1a859a53a498550d1f4a5b9b770414dea004d3d1
     def get(self, request):
         notice = db.read("noticeboard", "613a1a3b59842c7444fb0220")
         if notice['status'] == 200:
