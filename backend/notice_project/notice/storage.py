@@ -1,8 +1,10 @@
-import requests, json
+import requests
+import json
 from urllib.parse import urlencode
 
 
 CENTRIFUGO_TOKEN = "58c2400b-831d-411d-8fe8-31b6e337738b"
+
 
 class Dbnoticeboard:
 
@@ -11,27 +13,30 @@ class Dbnoticeboard:
     def __init__(self):
         BASE_URL = "https://api.zuri.chat"
         self.read_endpoint = (
-            BASE_URL + "/data/read/613fc3ea6173056af01b4b3e/{collec_name}/{org_id}?{query}"
+            BASE_URL +
+            "/data/read/613fc3ea6173056af01b4b3e/{collec_name}/{org_id}?{query}"
         )
         self.write_endpoint = BASE_URL + "/data/write"
         self.delete_endpoint = BASE_URL + "/data/delete"
         self.centrifugo_url = "https://realtime.zuri.chat/api"
 
     def post_to_centrifugo(self, data):
-        headers = {'Content-type': 'application/json', 'Authorization': 'apikey ' + CENTRIFUGO_TOKEN}
+        headers = {'Content-type': 'application/json',
+                   'Authorization': 'apikey ' + CENTRIFUGO_TOKEN}
         command = {
-            "method": "publish",    
+            "method": "publish",
             "params": {
-                "channel": "noticeboard", 
-                "data": data  
-                }
+                "channel": "noticeboard",
+                "data": data
             }
+        }
         try:
-            response = requests.post(url=self.centrifugo_url, headers=headers, json=command)
+            response = requests.post(
+                url=self.centrifugo_url, headers=headers, json=command)
             return {
-                    "status_code": response.status_code,
-                    "message": response.json()
-                }
+                "status_code": response.status_code,
+                "message": response.json()
+            }
         except Exception as e:
             print(e)
 
@@ -54,7 +59,6 @@ class Dbnoticeboard:
 
         except requests.exceptions.RequestException as err:
             print("OOps: There is a problem with the Request", err)
-        
 
     def save(self, collection_name, org_id, notice_data):
         """This method stores noticeboard related data as json to the Db.
@@ -67,11 +71,11 @@ class Dbnoticeboard:
             "bulk_write": False,
             "payload": notice_data,
         }
-        
-        data=json.dumps(di).encode('utf-8')
+
+        data = json.dumps(di).encode('utf-8')
         print(data)
         try:
-            r = requests.post(self.write_endpoint,data)
+            r = requests.post(self.write_endpoint, data)
             print(r.text)
             r.raise_for_status()
             self.post_to_centrifugo(notice_data)
@@ -81,7 +85,6 @@ class Dbnoticeboard:
             print("Http Error:", errh)
         except requests.exceptions.ConnectionError as errc:
             print("Error Connecting:", errc)
-
 
     def update(self, collection_name, org_id, notice_data, object_id):
         """This method updates noticeboard related data as json to the Db.
@@ -95,7 +98,7 @@ class Dbnoticeboard:
             "object_id": object_id,
             "payload": notice_data,
         }
-        
+
         try:
             res = requests.put(self.write_endpoint, json=di)
             response = res.json()
@@ -108,7 +111,6 @@ class Dbnoticeboard:
         except requests.exceptions.ConnectionError as errc:
             print("Error Connecting:", errc)
 
-
     def delete(self, org_id, collection_name, object_id):
         data = {
             "plugin_id": "613fc3ea6173056af01b4b3e",
@@ -116,7 +118,7 @@ class Dbnoticeboard:
             "collection_name": collection_name,
             "bulk_delete": False,
             "object_id": object_id,
-            "filter":{}
+            "filter": {}
         }
 
         try:
@@ -126,7 +128,6 @@ class Dbnoticeboard:
             return response
         except requests.exceptions.RequestException as err:
             print("OOps: There is a problem with the Request", err)
-
 
 
 db = Dbnoticeboard()
