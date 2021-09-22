@@ -22,7 +22,7 @@ class Dbnoticeboard:
 
     def post_to_centrifugo(self, data):
         headers = {'Content-type': 'application/json',
-                   'Authorization': 'apikey ' + CENTRIFUGO_TOKEN}
+                   'Authorization': f'apikey {CENTRIFUGO_TOKEN}'}
         command = {
             "method": "publish",
             "params": {

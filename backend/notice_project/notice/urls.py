@@ -1,5 +1,7 @@
 from django.urls import path
-from .views import install, sidebar, create_room, CreateNewNotices, UpdateNoticeAPIView, DeleteNotice, search, get_room, ViewNoticeAPI, NoticeDetail
+from .views import (install, sidebar, create_room, CreateNewNotices,
+                    UpdateNoticeAPIView, DeleteNotice, search, get_room,
+                    ViewNoticeAPI, NoticeDetail, add_user)
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import permissions
@@ -20,23 +22,23 @@ urlpatterns = [
 
     path('install', install, name='install'),
 
-    path('organizations/<str:org_id>/create-room', create_room),
+    path('create-room', create_room),
 
-    path('organizations/<str:org_id>/create-notice', CreateNewNotices.as_view()),
+    path('create', CreateNewNotices.as_view()),
 
-    path('organizations/<str:org_id>/edit-notice',
-         UpdateNoticeAPIView.as_view()),
+    path('notices/<str:id>/edit', UpdateNoticeAPIView.as_view()),
 
     path('search', search.as_view()),
 
-    path('organizations/<str:org_id>/get-room', get_room),
+    path('get-room', get_room),
 
-    path('organizations/<str:org_id>/notices', ViewNoticeAPI.as_view()),
+    path('add_user', add_user, name='add_user'),
 
-    path('organizations/<str:org_id>/notices/<str:id>', NoticeDetail.as_view()),
+    path('notices', ViewNoticeAPI.as_view()),
 
-    path('organizations/<str:org_id>/notices/<str:object_id>/delete',
-         DeleteNotice.as_view()),
+    path('notices/<str:id>', NoticeDetail.as_view()),
+
+    path('notices/<str:object_id>/delete', DeleteNotice.as_view()),
 
     path('docs', schema_view.with_ui(
         'swagger', cache_timeout=0), name='schema-swagger-ui'),

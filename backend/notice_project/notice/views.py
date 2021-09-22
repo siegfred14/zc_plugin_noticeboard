@@ -7,6 +7,7 @@ from .storage import db
 from .serializers import NoticeboardRoom, CreateNoticeSerializer
 from rest_framework.generics import ListAPIView
 import uuid
+from .email import sendemail
 
 
 @api_view(['GET'])
@@ -45,8 +46,8 @@ def sidebar(request):
 
 
 @api_view(['POST'])
-def create_room(request, org_id):
-    # org_id = "613a1a3b59842c7444fb0220"
+def create_room(request):
+    org_id = "613a1a3b59842c7444fb0220"
     serializer = NoticeboardRoom(data=request.data)
     if serializer.is_valid():
         db.save("noticeboard_room", org_id, serializer.data)
@@ -55,9 +56,13 @@ def create_room(request, org_id):
 
 
 @api_view(['GET'])
-def get_room(request, org_id):
-    # org_id = "613a1a3b59842c7444fb0220"
+def get_room(request):
+    org_id = "613a1a3b59842c7444fb0220"
     data = db.read("noticeboard_room", org_id)
+    login = "https://api.zuri.chat/auth/login"
+    print(requests.post(url=login, data={
+          "email": "jerry@gmail.com", "password": "ag222fan"}))
+
     return Response(data)
 
 
@@ -92,9 +97,16 @@ class CreateNewNotices(views.APIView):
     Create new notices
     '''
 
-    def post(self, request, org_id):
+    def post(self, request):
+        org_id = "613a1a3b59842c7444fb0220"
+        headers = {}
         serializer = CreateNoticeSerializer(data=request.data)
-
+        # validate request
+        #   if 'Authorization' in request.headers:
+        #       token = request.headers['Authorization']
+        #        headers={"Authorization": f"Bearer {request.headers['Authorization']}"}
+        #   else:
+        #       token = request.headers['Cookie']
         if serializer.is_valid():
             db.save(
                 "noticeboard",
@@ -102,6 +114,17 @@ class CreateNewNotices(views.APIView):
                 org_id,
                 notice_data=serializer.data
             )
+            '''
+                Retrieve Organisation members
+            '''
+
+            # login = "https://api.zuri.chat/auth/login"
+            # print(requests.post(url=login, data={"email": "user@example.com", "password": "pa$$word"}))
+            # url = f"https://api.zuri.chat/organizations/{org_id}/members/"
+            # members = requests.get(url=url, )
+            # send email after adding notice
+            sendemail("email/notify-users.html",
+                      {"vail": "shsd"}, "Testing app", "jrmhchukwuka@gmail.com")
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -110,11 +133,11 @@ class CreateNewNotices(views.APIView):
 
 class UpdateNoticeAPIView(views.APIView):
 
-    def put(self, request):
+    def put(self, request, id):
+        org_id = "613a1a3b59842c7444fb0220"
         serializer = CreateNoticeSerializer(data=request.data)
         if serializer.is_valid():
-            db.update("noticeboard", "613a1a3b59842c7444fb0220",
-                      serializer.data, object_id="613e4cf015fb2424261b6633")
+            db.update("noticeboard", org_id, serializer.data, object_id=id)
             return Response(
                 {
                     "success": True,
@@ -162,7 +185,8 @@ class DeleteNotice(views.APIView):
 
     """Delete a notice from the database"""
 
-    def delete(self, request, org_id, object_id):
+    def delete(self, request, object_id):
+        org_id = "613a1a3b59842c7444fb0220"
         try:
             db.delete(
                 collection_name='noticeboard',
@@ -186,7 +210,8 @@ class DeleteNotice(views.APIView):
 
 class ViewNoticeAPI(views.APIView):
 
-    def get(self, request, org_id):
+    def get(self, request):
+        org_id = "613a1a3b59842c7444fb0220"
         notice = db.read("noticeboard", org_id)
         if notice['status'] == 200:
             return Response(notice, status=status.HTTP_200_OK)
@@ -195,8 +220,15 @@ class ViewNoticeAPI(views.APIView):
 
 class NoticeDetail(views.APIView):
 
-    def get(self, request, org_id, id):
+    def get(self, request, id):
+        org_id = "613a1a3b59842c7444fb0220"
         notice = db.read("noticeboard", org_id, filter={"id": id})
         if notice["status"] == 200:
             return Response({"status": True, "data": notice["data"], "message": "sucessfully retrieved"}, status=status.HTTP_200_OK)
         return Response({"status": False, "message": "retrieved unsuccessfully"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def add_user(request):
+    data = {"message": "User has been added"}
+    return Response(data)
